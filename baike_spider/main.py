@@ -1,4 +1,6 @@
 # coding:utf8
+from imp import reload
+
 from baike_spider import url_manager
 from baike_spider import html_downloader,html_parser,html_output
 
@@ -29,7 +31,7 @@ class SpiderMain(object):
                 self.urls.add_new_urls(new_urls)
                 self.output.collect_data(new_data)
 
-                if count == 10:
+                if count == 1000:
                     break
                 count = count + 1
             except:

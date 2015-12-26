@@ -1,4 +1,5 @@
 # coding:utf8
+
 class HtmlOutput(object):
 
     def __init__(self):
@@ -13,20 +14,21 @@ class HtmlOutput(object):
 
 
     def output_html(self):
-        fout = open("output.html","w")
+        fout = open("output.html","w",encoding="utf-8")
 
-        fout.write("<html>")
-        fout.write("<body>")
-        fout.write("<table>")
+        fout.write("<html>\n")
+        fout.write("<body>\n")
+        fout.write("<table>\n")
         for data in self.datas:
-            fout.write("<tr>")
+            #print("()()",type(data["title"]))
+            fout.write("<tr>\n")
             fout.write("<td>%s</td>"%data["url"])
-            fout.write("<td>%s</td>"%data["title"].encode("utf-8"))
-            fout.write("<td>%s</td>"%data["summay"].encode("utf-8"))
-            fout.write("</tr>")
-        fout.write("</table>")
-        fout.write("</body>")
-        fout.write("</html>")
+            fout.write("<td>%s</td>"%data["title"])
+            fout.write("<td>%s</td>"%data["summary"])
+            fout.write("</tr>\n")
+        fout.write("</table>\n")
+        fout.write("</body>\n")
+        fout.write("</html>\n")
 
 
         fout.close()
