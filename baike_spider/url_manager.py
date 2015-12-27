@@ -12,14 +12,14 @@ class UrlManager(object):
             self.new_urls.add(url)
 
     def add_new_urls(self, urls):
-        if urls == None or len(urls)==0:
+        if urls is None or len(urls) == 0:
             return
         for url in urls:
             self.add_new_url(url)
 
     def get_new_url(self):
         new_url = self.new_urls.pop()
-        print("*",new_url)
+        # print("*",new_url)
         self.old_urls.add(new_url)
         return new_url
 
