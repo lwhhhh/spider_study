@@ -3,5 +3,6 @@
 class Output(object):
     def output(self, cont, index):
         img_name = "妞妞"
-        fout = open(img_name + str(index) + ".jpg", "wb")
+        ss = img_name + str(index) + ".jpg"
+        fout = open(ss, "wb")
         fout.write(cont)

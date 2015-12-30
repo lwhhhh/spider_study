@@ -11,9 +11,17 @@ class Parser(object):
 
     def get_all_links(self, page_cont):
         soup = BeautifulSoup(page_cont, "html.parser", from_encoding="utf-8")
-        self.links = soup.find_all()
-        for link in self.links:
-            print(link)
+        #print(soup.prettify())
+        self.tags = soup.find_all("img", src=re.compile(r".jpg"))
+        # print(type(self.tags))
+        for tag in self.tags:
+            #print(tag)
+            # temp_tag = BeautifulSoup(tag)
+            link = tag.get("src")
+            link = link.replace("square", "large")
+            #(link)
+            self.links.append(link)
+
 
     def parse(self, page_cont):
         if page_cont is None:

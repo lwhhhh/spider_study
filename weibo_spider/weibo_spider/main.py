@@ -18,15 +18,19 @@ class Spider(object):
 
     def craw(self):
         urls = self.manager.geturls()
+        i = 1
         for url in urls:
-            print(url)
+            # print(url)
             page_cont = self.downloader.download_page_cont(url)
+            #print(page_cont)
             img_links = self.parser.parse(page_cont)
             index = 1
             for img_link in img_links:
-                print(img_link)
+                # print(img_link)
                 img = self.downloader.download_img(img_link)
                 self.output.output(img, index)
+                print("抓取第%d张"%i)
+                i+=1
                 index += 1
 
 
