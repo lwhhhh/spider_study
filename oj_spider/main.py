@@ -19,12 +19,13 @@ class Spider(object):
         self.output = output.Output()
 
     def craw(self, root_url):
-        page = self.downloader.download_page("http://172.21.85.56/oj/auth/login?redirect=")
+        page = self.downloader.download_page(
+            "http://172.21.85.56/oj/auth/login?redirect=")
         # print(page)
         with open("ts.html", "w", encoding="utf-8") as f:
             f.write(page)
         link_1 = self.parser.get_userhome_link(page)
-        print(link_1)
+        # print(link_1)
 
         page_1 = self.downloader.download_page(link_1)
         # self.output.html_output(page_1)
@@ -35,12 +36,25 @@ class Spider(object):
         page = self.downloader.download_page(problem_links[0])
 
         # 获取报告dict
-        report_dict = self.parser.get_report(page)
+        report_dict, next_page_url = self.parser.get_report(page)
         for key in report_dict:
             page_code = self.downloader.download_page(
                 report_dict[key]["code_url"])
             code = self.parser.get_codes(page_code)
             self.output.html_output(code, report_dict[key], os.getcwd())
+
+        # 读取下一页
+        while next_page_url != None:
+            page = self.downloader.download_page(next_page_url)
+            report_dict, next_page_url = self.parser.get_report(page)
+            print(report_dict)
+            if report_dict is None or next_page_url is None:
+                return
+            for key in report_dict:
+                page_code = self.downloader.download_page(
+                    report_dict[key]["code_url"])
+                code = self.parser.get_codes(page_code)
+                self.output.html_output(code, report_dict[key], os.getcwd())
 """
         # 获取代码页面链接
         code_info_dict = self.parser.get_code_links(page)

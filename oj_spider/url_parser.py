@@ -31,12 +31,22 @@ class Parser(object):
 
         return problem_links
 
+    def get_next_link(self, page):
+        soup = BeautifulSoup(page, "html.parser", from_encoding="utf-8")
+        tag = soup.find(
+            "a", href=re.compile(r"top"))
+        next_url = "http://172.21.85.56" + tag.get("href")
+        # print(next_url)
+        return next_url
+
     # 未完成多页的情况处理
     def get_code_links(self, page):
         code_links = []
         soup = BeautifulSoup(page, "html.parser", from_encoding="utf-8")
         tags = soup.find_all(
             "a", target="_blank", href=re.compile(r"/oj/exercise/sourcecode\?status_id="))
+        if tags is None:
+            return
         for tag in tags:
             tlink = "http://172.21.85.56" + tag.get("href")
             code_links.append(tlink)
@@ -50,6 +60,8 @@ class Parser(object):
         soup = BeautifulSoup(page, "html.parser", from_encoding="utf-8")
         tags = soup.find("tbody", id="statusList")
         res = []
+        if tags == None:
+            return
         for child_tag in tags.children:
             # print(child_tag)
             line = ""
@@ -107,9 +119,11 @@ class Parser(object):
         # for key in count_dict:
             # print(key, ":", count_dict[key])
             for key in repotr_dict:
-                # pass
-                print(key, ":", repotr_dict[key])
-        return repotr_dict
+                pass
+                #print(key, ":", repotr_dict[key])
+
+        next_page_link = self.get_next_link(page)
+        return repotr_dict, next_page_link
 
     # 获取页面的代码
     def get_codes(self, page):
