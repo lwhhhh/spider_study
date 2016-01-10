@@ -19,8 +19,10 @@ class Spider(object):
         self.output = output.Output()
 
     def craw(self, root_url):
-        page = self.downloader.download_page("http://172.21.85.56/oj/")
+        page = self.downloader.download_page("http://172.21.85.56/oj/auth/login?redirect=")
         # print(page)
+        with open("ts.html", "w", encoding="utf-8") as f:
+            f.write(page)
         link_1 = self.parser.get_userhome_link(page)
         print(link_1)
 
@@ -38,7 +40,7 @@ class Spider(object):
             page_code = self.downloader.download_page(
                 report_dict[key]["code_url"])
             code = self.parser.get_codes(page_code)
-            self.output.html_output(code, report_dict[key],os.getcwd())
+            self.output.html_output(code, report_dict[key], os.getcwd())
 """
         # 获取代码页面链接
         code_info_dict = self.parser.get_code_links(page)
