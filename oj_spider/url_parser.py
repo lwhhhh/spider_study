@@ -14,17 +14,25 @@ class Parser(object):
     def get_userhome_link(self, page):
         soup = BeautifulSoup(page, "html.parser", from_encoding="utf-8")
         tag = soup.find(
-            "a", href=re.compile(r"/oj/author/userdata?"))
+            "a", href=re.compile(r"/oj/author/userdata\?"))
         user_link = tag.get("href")
         user_link = "http://172.21.85.56" + user_link
         return user_link
+
+    def get_username(self, page):
+        soup = BeautifulSoup(page, "html.parser", from_encoding="utf-8")
+        username = soup.find(
+            "div", style="height: 250px;color: #006600;").find("td", text=re.compile(
+                r"[\u4e00-\u9fa5]")).get_text().strip()
+        # print(username)
+        return username
 
     def get_problem_links(self, page):
         soup = BeautifulSoup(page, "html.parser", from_encoding="utf-8")
         problem_links = []
         tags = soup.find_all(
-            "a", href=re.compile(r"/oj/exercise/status\?author=201424133254&problem_id"))
-
+            "a", href=re.compile(r"/oj/exercise/status\?author="))
+        #print(tags)
         for tag in tags:
             tlink = "http://172.21.85.56" + tag.get("href")
             problem_links.append(tlink)
@@ -92,6 +100,7 @@ class Parser(object):
                 # 记录此页面中代码运行结果情况
                 if s == "Accepted":
                     count_dict["ac"] = count_dict["ac"] + 1
+                    # self.all_dict["ac"] =
                 elif s == "Compilation Error":
                     count_dict["ce"] = count_dict["ce"] + 1
                 elif s == "Waiting":

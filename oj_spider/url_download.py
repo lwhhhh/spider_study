@@ -7,7 +7,7 @@ import http.cookiejar
 
 class Downloader(object):
 
-    def __init__(self):
+    def __init__(self, username, password):
         self.headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36",
             #"Cookie": "PHPSESSID=qqcl9ai55vqqcliahl36la2kp7"
@@ -16,8 +16,8 @@ class Downloader(object):
         cookie_ = urllib.request.HTTPCookieProcessor(self.cookie_jar)
         self.opener = urllib.request.build_opener(cookie_)
         self.post_dict = {
-            "username": "201424133254",
-            "password": "wh6625622",
+            "username": username,
+            "password": password,
             "submit:": "sign in"
         }
         #self.opener.addheaders = self.headers
@@ -31,7 +31,7 @@ class Downloader(object):
         #response = urllib.request.urlopen(request)
         response = self.opener.open(url, self.post_data)
         page_cont = response.read().decode("utf-8")
-        #print(page_cont)
+        # print(page_cont)
         return page_cont
 
     # def get_problem_links(self):
