@@ -19,30 +19,36 @@ class Spider(object):
         self.output = output.Output()
         self.globe_dict = {}
 
+    def login(self, username, password):
+        login_page = self.downloader.download_page(
+            "http://172.21.85.56/oj/auth/login?redirect=")
+
+        login_result = self.parser.login_parser(login_page)
+        print(login_result)
+        if login_result == "failure":
+            return "failure"
+        elif login_result == "success":
+            return "success"
+
     def craw(self, root_url):
         page = self.downloader.download_page(
             "http://172.21.85.56/oj/auth/login?redirect=")
-        # print(page)
-        # with open("ts.html", "w", encoding="utf-8") as f:
-            # f.write(page)
 
         link_1 = self.parser.get_userhome_link(page)
-        # print(link_1)
 
-        page_1 = self.downloader.download_page(link_1)
-        # with open("tss.html", "w", encoding="utf-8") as f:
-            # f.write(page_1)
+        page_1 = self.downloader.download_page(link_1)  # User's page
+
         username = self.parser.get_username(page_1)
         self.output.mk_root_dir(username)
-       # print(username)
-        problem_links = self.parser.get_problem_links(page_1)
+
+        problem_links = self.parser.get_problem_links(page_1)  # User页面下所有问题的链接
         mark = 0
-        # print(problem_links)
+
         for problem_link in problem_links:
-            # print(problem_link)
-            page = self.downloader.download_page(problem_link)
-            # print(i)
-            # 获取报告dict
+
+            page = self.downloader.download_page(
+                problem_link)  # 一道题的提交记录页面(第一页)
+
             report_dict, next_page_url = self.parser.get_report(page)
             for key in report_dict:
                 page_code = self.downloader.download_page(
@@ -50,43 +56,33 @@ class Spider(object):
                 code = self.parser.get_codes(page_code)
                 self.output.html_output(code, report_dict[key], os.getcwd())
 
-            # 读取下一页
+            # 若这道题的提交记录还有下一页
             while next_page_url != None:
                 page = self.downloader.download_page(next_page_url)
-                report_dict, next_page_url = self.parser.get_report(page)
-                # if report_dict is None:
-                    # return
-                # print(report_dict)
-                # if report_dict is None or next_page_url is None:
-                    # return
-                if len(report_dict) == 0:
+                report_dict1, next_page_url1 = self.parser.get_report(page)
+
+                if len(report_dict1) == 0:
                     break
-                for key in report_dict:
+                for key in report_dict1:
                     page_code = self.downloader.download_page(
-                        report_dict[key]["code_url"])
+                        report_dict1[key]["code_url"])
                     code = self.parser.get_codes(page_code)
                     self.output.html_output(
-                        code, report_dict[key], os.getcwd())
+                        code, report_dict1[key], os.getcwd())
             print("Download no.%d successfully." % mark)
             mark = mark + 1
-"""
-        # 获取代码页面链接
-        code_info_dict = self.parser.get_code_links(page)
-
-        # 获取代码内容
-        page_code = self.downloader.download_page(
-            "http://172.21.85.56/oj/exercise/sourcecode?status_id=343478")
-        # print(page_code)
-        # self.output.html_output(page_code)
-        code = self.parser.get_codes(page_code)
-        # print(code)
-"""
 
 if __name__ == "__main__":
     print("ZQU OJ 代码下载器 \nversion 0.9")
-    name = input("oj username:")
-    password = input("oj password:")
-    print("请等待大概20s,运行过程中不要关闭窗口,程序运行完毕会自动退出 :)")
-    print("输出文件存放在该程序相同的目录")
+    name = input("OJ username:")
+    password = input("OJ password:")
     obj_spider = Spider(name, password)
+    print("\n登录中...")
+    while obj_spider.login(name, password) != "success":
+        print("登录失败,有可能是用户名或者密码输错[没有账号跟钟鏸老师要]")
+        name = input("OJ username:")
+        password = input("OJ password:")
+    print("登录成功...")
+    print("程序运行完毕后会自动退出,你的代码放在该程序目录下")
+    print("代码下载中...请等待")
     obj_spider.craw(root_url)

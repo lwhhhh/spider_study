@@ -11,6 +11,14 @@ class Parser(object):
     def __init__(self):
         pass
 
+    def login_parser(self, login_page):
+        soup = BeautifulSoup(login_page, "html.parser", from_encoding="utf-8")
+        tag = soup.find("div", class_="error")
+        if tag is not None:
+            return "failure"
+        else:
+            return "success"
+
     def get_userhome_link(self, page):
         soup = BeautifulSoup(page, "html.parser", from_encoding="utf-8")
         tag = soup.find(
@@ -32,7 +40,7 @@ class Parser(object):
         problem_links = []
         tags = soup.find_all(
             "a", href=re.compile(r"/oj/exercise/status\?author="))
-        #print(tags)
+        # print(tags)
         for tag in tags:
             tlink = "http://172.21.85.56" + tag.get("href")
             problem_links.append(tlink)
@@ -43,6 +51,7 @@ class Parser(object):
         soup = BeautifulSoup(page, "html.parser", from_encoding="utf-8")
         tag = soup.find(
             "a", href=re.compile(r"top"))
+        next_url = None  # important
         next_url = "http://172.21.85.56" + tag.get("href")
         # print(next_url)
         return next_url
