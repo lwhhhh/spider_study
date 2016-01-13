@@ -44,12 +44,14 @@ class Spider(object):
         problem_links = self.parser.get_problem_links(page_1)  # User页面下所有问题的链接
         mark = 0
 
-        for problem_link in problem_links:
+        for i in range(10):
 
             page = self.downloader.download_page(
-                problem_link)  # 一道题的提交记录页面(第一页)
-
-            report_dict, next_page_url = self.parser.get_report(page)
+                problem_links[i])  # 一道题的提交记录页面(第一页)
+            print(problem_links[i])
+            report_dict = {}
+            next_page_url = self.parser.get_report(page, report_dict)
+            #report_dict, = self.parser.get_report(page)
             for key in report_dict:
                 page_code = self.downloader.download_page(
                     report_dict[key]["code_url"])
@@ -58,17 +60,16 @@ class Spider(object):
 
             # 若这道题的提交记录还有下一页
             while next_page_url != None:
+                print(next_page_url)
                 page = self.downloader.download_page(next_page_url)
-                report_dict1, next_page_url1 = self.parser.get_report(page)
+                next_page_url = self.parser.get_report(page, report_dict)
 
-                if len(report_dict1) == 0:
-                    break
-                for key in report_dict1:
+                for key in report_dict:
                     page_code = self.downloader.download_page(
-                        report_dict1[key]["code_url"])
+                        report_dict[key]["code_url"])
                     code = self.parser.get_codes(page_code)
                     self.output.html_output(
-                        code, report_dict1[key], os.getcwd())
+                        code, report_dict[key], os.getcwd())
             print("Download no.%d successfully." % mark)
             mark = mark + 1
 

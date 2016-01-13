@@ -39,10 +39,11 @@ class Parser(object):
         soup = BeautifulSoup(page, "html.parser", from_encoding="utf-8")
         problem_links = []
         tags = soup.find_all(
-            "a", href=re.compile(r"/oj/exercise/status\?author="))
+            "a", href=re.compile(r"/oj/exercise/status\?author=\d+\&problem_id=\d+"))
         # print(tags)
         for tag in tags:
             tlink = "http://172.21.85.56" + tag.get("href")
+            # print(tlink)
             problem_links.append(tlink)
 
         return problem_links
@@ -51,6 +52,7 @@ class Parser(object):
         soup = BeautifulSoup(page, "html.parser", from_encoding="utf-8")
         tag = soup.find(
             "a", href=re.compile(r"top"))
+        print(tag)
         next_url = None  # important
         next_url = "http://172.21.85.56" + tag.get("href")
         # print(next_url)
@@ -70,9 +72,8 @@ class Parser(object):
             # print(tlink)
 
     # 未完成多页的情况处理
-    def get_report(self, page):
+    def get_report(self, page, report_dict):
         count_dict = {"ac": 0, "re": 0, "wa": 0, "tle": 0, "wait": 0, "ce": 0}
-        repotr_dict = {}
         page_next = False
         soup = BeautifulSoup(page, "html.parser", from_encoding="utf-8")
         tags = soup.find("tbody", id="statusList")
@@ -130,18 +131,18 @@ class Parser(object):
                     "a", href=re.compile(r"/oj/exercise/sourcecode")).get("href")
             # print(url)
             excute_dict["code_url"] = code_url
-            repotr_dict[run_id] = excute_dict
+            report_dict[run_id] = excute_dict
             line = line + "\n"
             res.append(line)
 
         # for key in count_dict:
             # print(key, ":", count_dict[key])
-            for key in repotr_dict:
+            for key in report_dict:
                 pass
                 #print(key, ":", repotr_dict[key])
 
         next_page_link = self.get_next_link(page)
-        return repotr_dict, next_page_link
+        return next_page_link
 
     # 获取页面的代码
     def get_codes(self, page):
