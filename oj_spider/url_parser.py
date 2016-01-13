@@ -52,7 +52,7 @@ class Parser(object):
         soup = BeautifulSoup(page, "html.parser", from_encoding="utf-8")
         tag = soup.find(
             "a", href=re.compile(r"top"))
-        print(tag)
+       # print(tag)
         next_url = None  # important
         next_url = "http://172.21.85.56" + tag.get("href")
         # print(next_url)
