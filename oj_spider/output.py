@@ -42,7 +42,12 @@ class Output(object):
             os.mkdir(target_dir)
             os.chdir(target_dir)
             """
-        print(parent)
+        #print(parent)
         os.chdir(parent)
         with open(file_name, "w+", encoding="utf-8") as f:
             f.write(page)
+
+    def data_output(self,content,dir):
+        os.chdir(dir)
+        with open("10 report.html","w",encoding="utf-8") as f:
+            f.write(content)
