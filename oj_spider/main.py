@@ -47,10 +47,10 @@ class Spider(object):
         mark = 1
 
         # 一个提交页面一个dict,所有dict存放在一个list中.一道题可以有多个dict,但只能有一个list
-        for i in range(50):
+        for i in problem_links:
             report_list = []
             page = self.downloader.download_page(
-                problem_links[i])  # 一道题的提交记录页面(第一页)
+                i)  # 一道题的提交记录页面(第一页)
             # print(problem_links[i])
 
             report_dict = {}
@@ -87,20 +87,26 @@ class Spider(object):
             problem_page = self.downloader.download_page(problem_url)
             title = self.parser.get_title(problem_page)
             title = title.strip("\n")
+            title = title.replace(":", "-")
+            title = title.replace("、", ",")
+            title = title.replace("/", " ")
+            title = title.replace("\\", " ")
+            title = title.replace("?", ".")
+            title = title.replace("*", ".")
             dir_name = problem_id + " " + title
 
             file_dir = self.output.mk_problem_dir(user_dir, dir_name)
             print(file_dir)
             # 获取代码
             for l in report_list:
-                for key1 in l:
+                for key in l:
                     code_page = self.downloader.download_page(
-                        l[key1]["code_url"])
+                        l[key]["code_url"])
                     code_source = self.parser.get_codes(code_page)
-                    l[key1]["code"] = code_source
-                    # Run.ID保证文件名不重合
+                    l[key]["code"] = code_source
+                    content_io = l[key]["code"]
                     file_name = (
-                        l[key1]["Status"] + " " + l[key1]["Submit Time"]).replace(":", "-") + ".cpp"
+                        l[key]["Status"] + " " + l[key]["Submit Time"]).replace(":", "-") + ".cpp"
                     file_name = file_name.strip("\n")
                     content_io = code_source
                     self.output.html_output(content_io, file_dir, file_name)
