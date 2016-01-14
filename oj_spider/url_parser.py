@@ -99,7 +99,19 @@ class Parser(object):
                 elif count == 2:
                     excute_dict["Pro.ID"] = s
                 elif count == 3:
-                    excute_dict["Status"] = s
+                    ss = ""
+                    # 好吧把Status转换成缩写吧 = =为了文件名的易读性
+                    if s == "Accepted":
+                        ss = "AC"
+                    elif s == "Compilation Error":
+                        ss = "CE"
+                    elif s == "Waiting":
+                        ss = "WAIT"
+                    elif s == "Wrong Answer":
+                        ss = "WA"
+                    elif s == "Runtime Error":
+                        ss = "RE"
+                    excute_dict["Status"] = ss
                 elif count == 4:
                     excute_dict["Exe.Time"] = s
                 elif count == 5:
@@ -156,3 +168,10 @@ class Parser(object):
         tags = soup.find("pre")
         code = tags.get_text()
         return code
+
+    def get_title(self, problem_page):
+        soup = BeautifulSoup(
+            problem_page, "html.parser", from_encoding="utf-8")
+        tag = soup.find("div", class_="title")
+        title = tag.get_text()
+        return title

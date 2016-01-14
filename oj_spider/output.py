@@ -19,14 +19,30 @@ class Output(object):
             os.mkdir(target_dir)
             os.chdir(target_dir)
 
-    def html_output(self, page, report_dict, dir):
-        root_dir = os.getcwd()
-        target_dir = root_dir + "//" + report_dict["Pro.ID"]
+        return target_dir
+
+    def mk_problem_dir(self, user_dir, dir_name):
+        os.chdir(user_dir)
+        target_dir = user_dir + "/" + dir_name
+        if os.path.isdir(target_dir):
+            os.chdir(target_dir)
+        else:
+            os.mkdir(target_dir)
+            os.chdir(target_dir)
+        # os.mkdir(target_dir)
+        return target_dir
+
+    def html_output(self, page, parent, file_name):
+        #root_dir = os.getcwd()
+        #target_dir = root_dir + "//" + report_dict["Pro.ID"]
+        """
         if os.path.isdir(target_dir):
             os.chdir(report_dict["Pro.ID"])
         else:
             os.mkdir(target_dir)
             os.chdir(target_dir)
-        with open(report_dict["Run.ID"] + ".cpp", "w+", encoding="utf-8") as f:
+            """
+        print(parent)
+        os.chdir(parent)
+        with open(file_name, "w+", encoding="utf-8") as f:
             f.write(page)
-        os.chdir(dir)
