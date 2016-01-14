@@ -127,21 +127,7 @@ class Spider(object):
             mark = mark + 1
             # self.t_list.append(report_list)
 
-    def isnote(self, line):
-        line = line.strip()
-        # print(line, line_count)
-        if len(line) >= 2:
-            # print("***")
-            # print("&&&", line[0], line[1])
-            if line[0] == 47 and line[1] == 47:
-                return "//"
-            elif line[0] == 47 and line[1] == 42:
-                return "/*"
-            else:
-                return "no"
-        return "no"
-
-    def analyse(self, code_count, note_count):
+    def analyse(self, code_count):
         # 先分析代码行数
         root_dir = base_dir + "/" + self.name_true
         for parent, dirnames, filenames in os.walk(root_dir):
@@ -150,29 +136,14 @@ class Spider(object):
                 print(filename)
                 print(parent)
                 with open(filename, "rb") as f:
+                    # 因为有CE代码的存在,可能导致判断注释代码的过程中陷入死循环,所以取消
                     line = f.readline().strip()
-                    print(line)
                     while line != b"":
-                        # print("*")
-                        #code_count = code_count + 1
-                        ret = self.isnote(line)
-                        print("ret=%s" % ret)
-                        if ret == "//":
-                            note_count = note_count + 1
-                        elif ret == "/*":
-                            line = f.readline().strip()
-                            # print(line)
-                            # if len(line) >= 2:
-                            while b"*/" not in line:
-                                line = f.readline().strip()
-                                note_count = note_count + 1
-                                print(line)
-                        else:
+                        if line != b"\n":
                             code_count = code_count + 1
-                        line = f.readline().strip()
-                        print(line)
+                            line = f.readline().strip()
 
-        return code_count, note_count
+        return code_count
 
 
 class LoginError(Exception):
@@ -199,8 +170,7 @@ if __name__ == "__main__":
         print("下载完毕,用时%d s" % (time_end - time_start))
         print("开始分析你的代码...")
         code_count = 0
-        note_count = 0
-        code_count, node_count = obj_spider.analyse(code_count, note_count)
+        code_count = obj_spider.analyse(code_count)
         print("代码行数: %d" % code_count)
-        print("注释行数: %d" % node_count)
+
         # a = input()
