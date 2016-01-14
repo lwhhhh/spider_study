@@ -63,10 +63,10 @@ class Spider(object):
         mark = 1
 
         # 一个提交页面一个dict,所有dict存放在一个list中.一道题可以有多个dict,但只能有一个list
-        for i in range(5):
+        for i in problem_links:
             report_list = []
             page = self.downloader.download_page(
-                problem_links[i])  # 一道题的提交记录页面(第一页)
+                i)  # 一道题的提交记录页面(第一页)
             # print(problem_links[i])
 
             report_dict = {}
@@ -212,20 +212,38 @@ class Spider(object):
         self.max_memory = ""
         self.logest_code = ""
         """
+        report_res = []
         print("time",time_max,time_min)
         print("id=:", sub_count_id, "max: ", self.most_submiss)
         print("\nproblem_nums: %d " % problem_nums)
         print("Submission: %d " % self.total_submiss)
         print("AC: %d " % self.total_ac)
+        self.total_ac = str(self.total_ac)
+        report_res.append(self.total_ac)
+
         print("WA: %d " % self.total_wa)
+        self.total_wa = str(self.total_wa)
+        report_res.append(self.total_wa)
+
         print("RE: %d " % self.total_re)
+        self.total_re = str(self.total_re)
+        report_res.append(self.total_re)
+
         print("TLE: %d " % self.total_tle)
+        self.total_tle = str(self.total_tle)
+        report_res.append(self.total_tle)
+
         print("CE: %d " % self.total_ce)
+        self.total_ce = str(self.total_ce)
+        report_res.append(self.total_ce)
+
         print("WAIT: %d " % self.total_wait)
+        self.total_wait = str(self.total_wait)
+        report_res.append(self.total_wait)
 
         print(base_dir)
         content = " "
-        self.output.data_output(content,dir)
+        self.output.data_output(report_res,base_dir)
         return code_count
 
 
@@ -259,4 +277,4 @@ if __name__ == "__main__":
         time_end = time.clock()
         print("用时%d s" % (time_end - time_start))
 
-        # a = input()
+        a = input()

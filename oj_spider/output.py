@@ -49,5 +49,42 @@ class Output(object):
 
     def data_output(self,content,dir):
         os.chdir(dir)
-        with open("10 report.html","w",encoding="utf-8") as f:
-            f.write(content)
+        print(os.getcwd())
+        with open("ai1.txt","r",encoding="utf-8") as f:
+            s = f.read() + "\n"
+        with open("report_temp.html","w",encoding = "utf-8") as f:
+            f.write(s)
+            f.write(".num0{background-color:#333333;height:")
+            #content[0] = str(content[0])
+            print(content[0])
+            f.write(content[0])
+            f.write("px;}\n")
+
+            f.write(".num1{background-color:#333333;height:")
+            #content[1] = str(content[1])
+            f.write(content[1])
+            f.write("px;}\n")
+
+            f.write(".num2{background-color:#990099;height:")
+            #content[2] = str(content[2])
+            f.write(content[2])
+            f.write("px;}\n")
+
+            f.write(".num3{background-color:#990099;height:")
+            #content[3] = str(content[3])
+            f.write(content[3])
+            f.write("px;}\n")
+
+            f.write(".num4{background-color:#00A000;height:")
+            #content[4] = str(content[4])
+            f.write(content[4])
+            f.write("px;}\n")
+
+            f.write(".num5{background-color:#00A000;height:")
+            #content[5] = str(content[5])
+            f.write(content[5])
+            f.write("px;}\n")
+        with open("ai2.txt","r",encoding="utf-8") as f:
+            s = f.read()
+        with open("report_temp.html","a+",encoding="utf-8") as f:
+            f.write(s)
