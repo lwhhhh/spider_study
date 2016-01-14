@@ -40,38 +40,85 @@ class Spider(object):
         page_1 = self.downloader.download_page(link_1)  # User's page
 
         username = self.parser.get_username(page_1)
-        self.output.mk_root_dir(username)
+        user_dir = self.output.mk_root_dir(username)
+        print("文件夹创建成功")
 
         problem_links = self.parser.get_problem_links(page_1)  # User页面下所有问题的链接
         mark = 1
 
-        for i in range(300):
-
+        # 一个提交页面一个dict,所有dict存放在一个list中.一道题可以有多个dict,但只能有一个list
+        for i in problem_links:
+            report_list = []
             page = self.downloader.download_page(
-                problem_links[i])  # 一道题的提交记录页面(第一页)
+                i)  # 一道题的提交记录页面(第一页)
             # print(problem_links[i])
-            report_dict = {}
-            next_page_url = self.parser.get_report(page, report_dict)
-            # report_dict, = self.parser.get_report(page)
-            for key in report_dict:
-                page_code = self.downloader.download_page(
-                    report_dict[key]["code_url"])
-                code = self.parser.get_codes(page_code)
-                self.output.html_output(code, report_dict[key], os.getcwd())
 
-            # 若这道题的提交记录还有下一页
+            report_dict = {}
+            report_dict, next_page_url = self.parser.get_report(page)
+            report_list.append(report_dict)
+            # ↑ 第一页信息有了
+            # for l in report_list:
+                # for key in l:
+                    # rint(key)
+            # 处理多页提交
             while next_page_url != None:
                 # print(next_page_url)
-                page = self.downloader.download_page(next_page_url)
-                next_page_url = self.parser.get_report(page, report_dict)
+                report_dict_t = {}
+                next_page = self.downloader.download_page(next_page_url)
+                report_dict_t, next_page_url = self.parser.get_report(
+                    next_page)
+                #print(report_dict_t, next_page_url)
+                report_list.append(report_dict_t)
 
-                for key in report_dict:
-                    page_code = self.downloader.download_page(
-                        report_dict[key]["code_url"])
-                    code = self.parser.get_codes(page_code)
-                    self.output.html_output(
-                        code, report_dict[key], os.getcwd())
-            print("Download no.%d successfully." % mark)
+            # 获取题号
+            problem_id = ""
+            problem_status = ""
+            for d in report_list[0]:
+                problem_id = report_list[0][d]["Pro.ID"]
+                problem_id = problem_id.strip("\n")
+                problem_status = report_list[0][d]["Status"]
+                problem_status = problem_status.strip("\n")
+                break
+
+            problem_url = (
+                "http://172.21.85.56/oj/exercise/problem?problem_id=" + problem_id)
+
+            # 获取题目名称,输出的时候做文件名用
+            problem_page = self.downloader.download_page(problem_url)
+            title = self.parser.get_title(problem_page)
+            title = title.strip("\n")
+            title = title.replace(":", "-")
+            title = title.replace("、", ",")
+            title = title.replace("/", " ")
+            title = title.replace("\\", " ")
+            title = title.replace("?", ".")
+            title = title.replace("*", ".")
+            dir_name = problem_id + " " + title
+
+            file_dir = self.output.mk_problem_dir(user_dir, dir_name)
+            print(file_dir)
+            # 获取代码
+            for l in report_list:
+                for key in l:
+                    code_page = self.downloader.download_page(
+                        l[key]["code_url"])
+                    code_source = self.parser.get_codes(code_page)
+                    l[key]["code"] = code_source
+                    content_io = l[key]["code"]
+                    file_name = (
+                        l[key]["Status"] + " " + l[key]["Submit Time"]).replace(":", "-") + ".cpp"
+                    file_name = file_name.strip("\n")
+                    content_io = code_source
+                    self.output.html_output(content_io, file_dir, file_name)
+                    print(file_name)
+
+           # print(dir_name)
+
+            # file_name =
+            io_content = ""
+            # 输出代码到文件
+            problem_url = report_list[0]
+            print("finish %d\n" % mark)
             mark = mark + 1
 
 
@@ -87,10 +134,14 @@ if __name__ == "__main__":
     login_res = obj_spider.login(name, password)
     if(login_res != "success"):
         print("登录失败,有可能是用户名或者密码输错[没有账号跟钟鏸老师要]\n")
-        print("程序初始化失败,5s后退出")
-        time.sleep(5)
+        print("程序初始化失败,3s后退出")
+        time.sleep(3)
     else:
         print("登录成功...")
         print("程序运行完毕后会自动退出,你的代码放在该程序目录下")
         print("代码下载中...请等待")
+        time_start = time.clock()
         obj_spider.craw(root_url)
+        time_end = time.clock()
+        print("下载完毕,用时%d s" % (time_end - time_start))
+    a = input()

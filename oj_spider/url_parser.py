@@ -51,11 +51,15 @@ class Parser(object):
     def get_next_link(self, page):
         soup = BeautifulSoup(page, "html.parser", from_encoding="utf-8")
         tag = soup.find(
-            "a", href=re.compile(r"top"))
-       # print(tag)
-        next_url = None  # important
-        next_url = "http://172.21.85.56" + tag.get("href")
-        # print(next_url)
+            "a", href=re.compile(r"/oj/exercise/status\?\&problem_id=\d+\&author=\d+\&top=\d+"))
+       # print(tag)/oj/exercise/status?&problem_id=1001&author=201424133254&top=105923
+        next_url = ""
+        if tag is None:
+            next_url = None
+        else:
+            postfix = tag.get("href")
+            next_url = "http://172.21.85.56" + postfix
+            # print(next_url)
         return next_url
 
     # 未完成多页的情况处理
@@ -72,8 +76,9 @@ class Parser(object):
             # print(tlink)
 
     # 未完成多页的情况处理
-    def get_report(self, page, report_dict):
+    def get_report(self, page):
         count_dict = {"ac": 0, "re": 0, "wa": 0, "tle": 0, "wait": 0, "ce": 0}
+        report_dict = {}
         page_next = False
         soup = BeautifulSoup(page, "html.parser", from_encoding="utf-8")
         tags = soup.find("tbody", id="statusList")
@@ -94,7 +99,19 @@ class Parser(object):
                 elif count == 2:
                     excute_dict["Pro.ID"] = s
                 elif count == 3:
-                    excute_dict["Status"] = s
+                    ss = ""
+                    # 好吧把Status转换成缩写吧 = =为了文件名的易读性
+                    if s == "Accepted":
+                        ss = "AC"
+                    elif s == "Compilation Error":
+                        ss = "CE"
+                    elif s == "Waiting":
+                        ss = "WAIT"
+                    elif s == "Wrong Answer":
+                        ss = "WA"
+                    elif s == "Runtime Error":
+                        ss = "RE"
+                    excute_dict["Status"] = ss
                 elif count == 4:
                     excute_dict["Exe.Time"] = s
                 elif count == 5:
@@ -132,6 +149,7 @@ class Parser(object):
             # print(url)
             excute_dict["code_url"] = code_url
             report_dict[run_id] = excute_dict
+
             line = line + "\n"
             res.append(line)
 
@@ -139,10 +157,10 @@ class Parser(object):
             # print(key, ":", count_dict[key])
             for key in report_dict:
                 pass
-                #print(key, ":", repotr_dict[key])
+                # print(key, ":", report_dict[key])
 
         next_page_link = self.get_next_link(page)
-        return next_page_link
+        return report_dict, next_page_link
 
     # 获取页面的代码
     def get_codes(self, page):
@@ -150,3 +168,10 @@ class Parser(object):
         tags = soup.find("pre")
         code = tags.get_text()
         return code
+
+    def get_title(self, problem_page):
+        soup = BeautifulSoup(
+            problem_page, "html.parser", from_encoding="utf-8")
+        tag = soup.find("div", class_="title")
+        title = tag.get_text()
+        return title
