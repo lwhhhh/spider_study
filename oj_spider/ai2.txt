@@ -4,7 +4,7 @@
     <div class="col-md-20 col-md-offset-10">
       <div id="inqbase" style="padding-top:80px;margin-top:-25px;">
         <div class="panel panel-info" >
-          <div class="panel-heading">成绩统计</div>
+          <div class="panel-heading">题目统计</div>
           <form id="infofrm">
             <div id="total" class="panel-body">
               <div id="outside"><div>

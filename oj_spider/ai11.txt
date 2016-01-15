@@ -6,7 +6,7 @@
 #outside{
   position:relative;
   width:100%;
-  height:100px;
+  height:200px;
   border-left-style:outset;
   border-left-width:4px;
   border-bottom-style:inset;
