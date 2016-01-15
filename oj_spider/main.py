@@ -63,10 +63,10 @@ class Spider(object):
         mark = 1
 
         # 一个提交页面一个dict,所有dict存放在一个list中.一道题可以有多个dict,但只能有一个list
-        for i in range(5):
+        for i in problem_links:
             report_list = []
             page = self.downloader.download_page(
-                problem_links[i])  # 一道题的提交记录页面(第一页)
+                i)  # 一道题的提交记录页面(第一页)
             # print(problem_links[i])
 
             report_dict = {}
@@ -122,8 +122,8 @@ class Spider(object):
                     code_page = self.downloader.download_page(
                         l[key]["code_url"])
                     code_source = self.parser.get_codes(code_page)
-                    l[key]["code"] = code_source
-                    content_io = l[key]["code"]
+                    #l[key]["code"] = code_source
+                    content_io = code_source
                     file_name = (
                         l[key]["Status"] + " " + l[key]["Submit Time"]).replace(":", "-") + ".cpp"
                     file_name = file_name.strip("\n")
@@ -137,12 +137,14 @@ class Spider(object):
             io_content = ""
             # 输出代码到文件
             problem_url = report_list[0]
-            print("finish %d\n" % mark)
+            print("finish %d" % mark)
             mark = mark + 1
+            break
             # self.t_list.append(report_list)
 
     def analyse(self, code_count):
-        # 先分析代码行数
+
+        # 统计代码行数
         root_dir = base_dir + "/" + self.name_true
         for parent, dirnames, filenames in os.walk(root_dir):
             for filename in filenames:
@@ -157,6 +159,22 @@ class Spider(object):
                             code_count = code_count + 1
                             line = f.readline().strip()
 
+        # 生成时间,从2013-01至2016-12
+        year_list = [y for y in range(2013, 2017)]
+        month_list = []
+        s = ""
+        for m in range(1, 13):
+            if m < 10:
+                s = "0" + str(m)
+            else:
+                s = str(m)
+            month_list.append(s)
+            # print(s)
+        date_list = [str(y) + "-" + str(m)
+                     for y in year_list for m in month_list]
+        date_dict = {}
+        for d in date_list:
+            date_dict[d] = 0
         # 好吧开始分析代码!!!
         """
             要分析的内容有:
@@ -184,7 +202,7 @@ class Spider(object):
                 if self.most_submiss < sub_count:
                     self.most_submiss = sub_count
                     sub_count_id = problem_id
-                    #print(self.most_submiss,sub_count_id,"*")
+                    # print(self.most_submiss,sub_count_id,"*")
                 for key in li:
                     # print(key)
                     self.total_submiss = self.total_submiss + 1
@@ -202,6 +220,9 @@ class Spider(object):
                     elif status == "WAIT":
                         self.total_wait = self.total_wait + 1
                     time_temp = li[key]["Submit Time"]
+                    time_temp_1 = time_temp[:7]
+                    date_dict[time_temp_1] += 1
+                    #print(time_temp_1)
                     if time_max < time_temp:
                         time_max = time_temp
                     if time_min > time_temp:
@@ -212,20 +233,58 @@ class Spider(object):
         self.max_memory = ""
         self.logest_code = ""
         """
-        print("time",time_max,time_min)
+        report_res = []
+        print("time", time_max, time_min)
         print("id=:", sub_count_id, "max: ", self.most_submiss)
         print("\nproblem_nums: %d " % problem_nums)
         print("Submission: %d " % self.total_submiss)
-        print("AC: %d " % self.total_ac)
-        print("WA: %d " % self.total_wa)
-        print("RE: %d " % self.total_re)
-        print("TLE: %d " % self.total_tle)
-        print("CE: %d " % self.total_ce)
-        print("WAIT: %d " % self.total_wait)
 
-        print(base_dir)
+        report_res1 = {}
+        # 总提交,ac数,wa数,tle数,re数,ce数,wait数,ac%,wa%,tle%,re%,ce%,wait%
+        # 第一次在oj上的提交,最近一次提交
+        report_res1["ts"] = str(self.total_submiss)
+        report_res1["ac"] = str(self.total_ac)
+        report_res1["wa"] = str(self.total_wa)
+        report_res1["tle"] = str(self.total_tle)
+        report_res1["re"] = str(self.total_re)
+        report_res1["ce"] = str(self.total_ce)
+        report_res1["wait"] = str(self.total_wait)
+        report_res1["ac%"] = str(
+            "%.2f" % (int(self.total_ac) / int(self.total_submiss) * 100))
+        report_res1["wa%"] = str(
+            "%.2f" % (int(self.total_wa) / int(self.total_submiss) * 100))
+        report_res1["tle%"] = str(
+            "%.2f" % (int(self.total_tle) / int(self.total_submiss) * 100))
+        report_res1["re%"] = str(
+            "%.2f" % (int(self.total_re) / int(self.total_submiss) * 100))
+        print("AC: %d " % self.total_ac)
+        self.total_ac = str(self.total_ac)
+        report_res.append(self.total_ac)
+
+        print("WA: %d " % self.total_wa)
+        self.total_wa = str(self.total_wa)
+        report_res.append(self.total_wa)
+
+        print("RE: %d " % self.total_re)
+        self.total_re = str(self.total_re)
+        report_res.append(self.total_re)
+
+        print("TLE: %d " % self.total_tle)
+        self.total_tle = str(self.total_tle)
+        report_res.append(self.total_tle)
+
+        print("CE: %d " % self.total_ce)
+        self.total_ce = str(self.total_ce)
+        report_res.append(self.total_ce)
+
+        print("WAIT: %d " % self.total_wait)
+        self.total_wait = str(self.total_wait)
+        report_res.append(self.total_wait)
+
+        # print(base_dir)
         content = " "
-        self.output.data_output(content,dir)
+        self.output.data_output(report_res, report_res1, base_dir, code_count)
+        self.output.data_output2(date_list, date_dict, base_dir)
         return code_count
 
 
@@ -233,9 +292,10 @@ class LoginError(Exception):
     pass
 
 if __name__ == "__main__":
-    print("OJ 代码下载器 \nversion 0.9")
-    name = input("OJ username:")
-    password = input("OJ password:")
+    print("OJ 代码下载器 \nversion 0.98")
+    print("/*\n author:14软件2班 lwh\n 联系方式:lwhile@outlook.com\n\n*/")
+    name = input("OJ Username: ")
+    password = input("OJ Password: ")
     obj_spider = Spider(name, password)
     print("\n登录中...")
     login_res = obj_spider.login(name, password)
@@ -252,11 +312,11 @@ if __name__ == "__main__":
         time_end = time.clock()
         print("下载完毕,用时%d s" % (time_end - time_start))
         print("开始分析你的代码...")
-        print("分析完成.")
         code_count = 0
         code_count = obj_spider.analyse(code_count)
+        print("分析完成.")
         print("代码行数: %d" % code_count)
         time_end = time.clock()
         print("用时%d s" % (time_end - time_start))
 
-        # a = input()
+        a = input()
