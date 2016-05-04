@@ -14,13 +14,12 @@ def save_json(response_data):
         API只能调用一次
         珍惜机会所以把下载到的数据先保存一份到磁盘上
     '''
-    with open(SAVE_PATH,w) as fp:
+    with open(SAVE_PATH,'w') as fp:
         fp.write(response_data)
     
 def dowload(url):
-    response_data = urllib.request.urlopen(url).read()
+    response_data = urllib.request.urlopen(url).read().decode()
     save_json(response_data)
-    response_data = response_data.decode('utf8')
     return response_data
     
 def set_url():
